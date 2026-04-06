@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // Si tu déploies, remplace cette variable par ton URL Render
-const API_URL = "http://localhost:5000";
+const API_URL = "https://qr-code-generator-python3.onrender.com";
 
 function App() {
   const [url, setUrl] = useState('');
