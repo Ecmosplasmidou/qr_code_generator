@@ -46,7 +46,7 @@ def generate_qr():
             return jsonify({"error": "URL manquante"}), 400
 
         short_id = str(uuid.uuid4())[:8]
-        redirect_url = f"{BASE_URL}/r/{short_id}"
+        redirect_url = f"https://qr-code-generator-python3.onrender.com/r/{short_id}"
         
         # Génération de l'image QR en mémoire
         qr = segno.make(redirect_url)
