@@ -3,7 +3,7 @@ import os
 import io
 import base64
 import json
-import requests # Ajoute 'requests' dans ton requirements.txt
+import requests
 from datetime import datetime
 from flask import Flask, request, redirect, jsonify
 from flask_cors import CORS
@@ -17,7 +17,10 @@ DB_FILE = "database.json"
 def load_db():
     if os.path.exists(DB_FILE):
         with open(DB_FILE, "r", encoding='utf-8') as f:
-            return json.load(f)
+            try:
+                return json.load(f)
+            except:
+                return {}
     return {}
 
 def save_db(data):
@@ -29,8 +32,11 @@ def generate_qr():
     try:
         data = request.json
         original_url = data.get('url')
+        if not original_url:
+            return jsonify({"error": "URL manquante"}), 400
+
         short_id = str(uuid.uuid4())[:8]
-        # URL Hardcodée comme tu l'as fait
+        # Remplace par ton URL Render si tu ne l'as pas déjà fait
         redirect_url = f"https://qr-code-generator-python3.onrender.com/r/{short_id}"
         
         qr = segno.make(redirect_url)
@@ -44,7 +50,7 @@ def generate_qr():
             'originalUrl': original_url,
             'qrImageUrl': f"data:image/png;base64,{img_str}",
             'scanCount': 0,
-            'last_scan': None # On stockera ici les infos du tout dernier scan
+            'scans_history': [] # Liste pour stocker TOUS les scans
         }
         save_db(db)
         return jsonify(db[short_id]), 200
@@ -57,14 +63,12 @@ def redirect_and_track(short_id):
     if short_id in db:
         # 1. Détection de l'appareil
         ua = request.headers.get('User-Agent', '')
-        device = "PC/Autre"
-        if "iPhone" in ua: device = "iPhone"
-        elif "Android" in ua: device = "Android"
+        device = "iPhone" if "iPhone" in ua else "Android" if "Android" in ua else "PC/Autre"
         
         # 2. Détection de la Ville via l'IP
         city = "Inconnue"
         try:
-            # On récupère l'IP (Render transmet l'IP réelle via X-Forwarded-For)
+            # Récupération de l'IP réelle sur Render
             ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0]
             geo = requests.get(f"http://ip-api.com/json/{ip}", timeout=2).json()
             if geo.get('status') == 'success':
@@ -72,13 +76,15 @@ def redirect_and_track(short_id):
         except:
             pass
 
-        # 3. Mise à jour des stats
-        db[short_id]['scanCount'] += 1
-        db[short_id]['last_scan'] = {
-            "date": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        # 3. Ajout du scan à l'historique
+        new_scan = {
+            "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
             "device": device,
             "city": city
         }
+        
+        db[short_id]['scans_history'].append(new_scan)
+        db[short_id]['scanCount'] += 1
         
         save_db(db)
         return redirect(db[short_id]['originalUrl'])
