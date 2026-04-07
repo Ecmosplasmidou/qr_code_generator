@@ -154,6 +154,25 @@ def delete_qr(short_id):
         return jsonify({"status": "ok"}), 200
     return jsonify({"error": "QR Code non trouvé"}), 404
 
+@app.route('/update-title/<short_id>', methods=['PATCH'])
+def update_title(short_id):
+    try:
+        data = request.json
+        new_title = data.get('title')
+        if not new_title:
+            return jsonify({"error": "Titre manquant"}), 400
+
+        result = qrcodes_collection.update_one(
+            {"id": short_id},
+            {"$set": {"title": new_title}}
+        )
+        
+        if result.modified_count > 0 or result.matched_count > 0:
+            return jsonify({"status": "ok"}), 200
+        return jsonify({"error": "QR Code non trouvé"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
     # On utilise le port fourni par Render ou 5000 par défaut
     port = int(os.environ.get("PORT", 5000))
