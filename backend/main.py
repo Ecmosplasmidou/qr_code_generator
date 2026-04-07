@@ -11,7 +11,6 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 
 # 1. CHARGEMENT DES VARIABLES D'ENVIRONNEMENT
-# Lit le fichier .env en local. Sur Render, il utilisera les variables de l'onglet Environment.
 load_dotenv()
 
 app = Flask(__name__)
@@ -22,8 +21,6 @@ MONGO_URI = os.environ.get("MONGO_URI")
 
 if not MONGO_URI:
     print("❌ ERREUR : La variable MONGO_URI est introuvable.")
-    # On ne bloque pas l'exécution pour permettre à Flask de démarrer, 
-    # mais les routes MongoDB échoueront.
     client = None
     qrcodes_collection = None
 else:
@@ -46,6 +43,12 @@ def generate_qr():
     try:
         data = request.json
         original_url = data.get('url')
+        
+        # Récupération des options de style (couleurs)
+        # Valeurs par défaut : Noir sur Blanc
+        dark_color = data.get('color', '#000000')
+        light_color = data.get('bg_color', '#FFFFFF')
+        
         if not original_url:
             return jsonify({"error": "URL manquante"}), 400
 
@@ -55,25 +58,31 @@ def generate_qr():
         # URL de redirection (Celle de ton serveur Render)
         redirect_url = f"https://qr-code-generator-python3.onrender.com/r/{short_id}"
         
-        # Création du QR Code
-        qr = segno.make(redirect_url)
+        # Création du QR Code avec Segno
+        # 'error=h' permet une meilleure lecture même avec des couleurs claires
+        qr = segno.make(redirect_url, error='h')
         out = io.BytesIO()
-        qr.save(out, kind='png', scale=10)
+        
+        # Sauvegarde avec les couleurs personnalisées
+        qr.save(out, kind='png', scale=10, dark=dark_color, light=light_color)
+        
         img_str = base64.b64encode(out.getvalue()).decode('utf-8')
         
         # Structure du document pour MongoDB
         new_document = {
             'id': short_id,
+            'title': original_url,
             'originalUrl': original_url,
             'qrImageUrl': f"data:image/png;base64,{img_str}",
+            'color': dark_color,
+            'bg_color': light_color,
             'scanCount': 0,
-            'scans_history': [] # Liste vide qui accueillera tous les futurs scans
+            'scans_history': []
         }
         
-        # Sauvegarde dans MongoDB
         qrcodes_collection.insert_one(new_document)
         
-        # Nettoyage de l'objet pour la réponse JSON (on retire l'ID interne de MongoDB)
+        # Suppression de l'ID interne MongoDB pour la réponse
         new_document.pop('_id', None)
         return jsonify(new_document), 200
 
@@ -85,25 +94,15 @@ def redirect_and_track(short_id):
     if qrcodes_collection is None:
         return "Erreur de base de données", 500
 
-    # Recherche du QR code dans la base
     qr_item = qrcodes_collection.find_one({"id": short_id})
     
     if qr_item:
-        # --- COLLECTE DES DONNÉES DE SCAN ---
-        
-        # 1. Appareil
+        # Collecte des données de scan
         ua = request.headers.get('User-Agent', '')
-        if "iPhone" in ua:
-            device = "iPhone"
-        elif "Android" in ua:
-            device = "Android"
-        else:
-            device = "PC/Autre"
+        device = "iPhone" if "iPhone" in ua else "Android" if "Android" in ua else "PC/Autre"
         
-        # 2. Ville via IP (ip-api)
         city = "Inconnue"
         try:
-            # Récupération de l'IP réelle (Render utilise X-Forwarded-For)
             ip_header = request.headers.get('X-Forwarded-For', request.remote_addr)
             ip = ip_header.split(',')[0].strip()
             
@@ -111,25 +110,23 @@ def redirect_and_track(short_id):
             if geo_res.get('status') == 'success':
                 city = geo_res.get('city', 'Inconnue')
         except:
-            pass # En cas d'erreur API geo, on garde "Inconnue"
+            pass
 
-        # 3. Création de l'entrée d'historique
         new_scan = {
             "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
             "device": device,
             "city": city
         }
         
-        # --- MISE À JOUR DANS MONGODB ---
+        # Mise à jour dans MongoDB (Incrémentation + Historique)
         qrcodes_collection.update_one(
             {"id": short_id},
             {
-                "$inc": {"scanCount": 1},        # On ajoute +1 au compteur
-                "$push": {"scans_history": new_scan} # On ajoute le scan à la liste
+                "$inc": {"scanCount": 1},
+                "$push": {"scans_history": new_scan}
             }
         )
         
-        # Redirection finale vers le lien original
         return redirect(qr_item['originalUrl'])
         
     return "Lien QR Code non trouvé", 404
@@ -138,8 +135,6 @@ def redirect_and_track(short_id):
 def get_all():
     if qrcodes_collection is None:
         return jsonify([]), 500
-        
-    # On récupère tout, on exclut l'ID technique '_id' de MongoDB
     all_qr = list(qrcodes_collection.find({}, {'_id': 0}))
     return jsonify(all_qr), 200
 
@@ -149,31 +144,48 @@ def delete_qr(short_id):
         return jsonify({"error": "Base de données non connectée"}), 500
         
     result = qrcodes_collection.delete_one({"id": short_id})
-    
     if result.deleted_count > 0:
         return jsonify({"status": "ok"}), 200
-    return jsonify({"error": "QR Code non trouvé"}), 404
+    return jsonify({"error": "Non trouvé"}), 404
 
+# --- MODIFIER LE TITRE ---
 @app.route('/update-title/<short_id>', methods=['PATCH'])
 def update_title(short_id):
     try:
         data = request.json
         new_title = data.get('title')
-        if not new_title:
-            return jsonify({"error": "Titre manquant"}), 400
+        qrcodes_collection.update_one({"id": short_id}, {"$set": {"title": new_title}})
+        return jsonify({"status": "ok"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-        result = qrcodes_collection.update_one(
-            {"id": short_id},
-            {"$set": {"title": new_title}}
-        )
-        
-        if result.modified_count > 0 or result.matched_count > 0:
-            return jsonify({"status": "ok"}), 200
-        return jsonify({"error": "QR Code non trouvé"}), 404
+# --- MODIFIER L'URL (QR DYNAMIQUE) ---
+@app.route('/update-url/<short_id>', methods=['PATCH'])
+def update_url(short_id):
+    try:
+        data = request.json
+        new_url = data.get('url')
+        qrcodes_collection.update_one({"id": short_id}, {"$set": {"originalUrl": new_url}})
+        return jsonify({"status": "ok"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# --- STATS GLOBALES POUR ANALYTICS ---
+@app.route('/global-stats', methods=['GET'])
+def get_global_stats():
+    if qrcodes_collection is None:
+        return jsonify({}), 500
+    try:
+        all_qr = list(qrcodes_collection.find({}, {'_id': 0}))
+        total_scans = sum(qr.get('scanCount', 0) for qr in all_qr)
+        total_qrs = len(all_qr)
+        return jsonify({
+            "total_scans": total_scans,
+            "total_qrs": total_qrs
+        }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    # On utilise le port fourni par Render ou 5000 par défaut
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
