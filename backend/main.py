@@ -15,6 +15,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
+# CONFIGURATION MONGODB
 MONGO_URI = os.environ.get("MONGO_URI")
 client = MongoClient(MONGO_URI) if MONGO_URI else None
 db = client['qr_database'] if client else None
@@ -32,7 +33,11 @@ def generate_entry():
         gen_type = data.get('type', 'qr')
         dark_color = data.get('color', '#000000')
         light_color = data.get('bg_color', '#FFFFFF')
+        design = data.get('design', 'square')
+        frame = data.get('frame', 'none')
         
+        if not original_url: return jsonify({"error": "URL manquante"}), 400
+
         short_id = str(uuid.uuid4())[:8]
         redirect_url = f"https://qr-code-generator-python3.onrender.com/r/{short_id}"
         
@@ -51,6 +56,8 @@ def generate_entry():
             'qrImageUrl': img_str,
             'color': dark_color,
             'bg_color': light_color,
+            'design': design,
+            'frame': frame,
             'scanCount': 0,
             'scans_history': [],
             'rowColor': generate_row_color(short_id)
@@ -64,13 +71,21 @@ def generate_entry():
 def update_style(short_id):
     try:
         data = request.json
-        dark, light = data.get('color'), data.get('bg_color')
+        dark = data.get('color')
+        light = data.get('bg_color')
+        design = data.get('design')
+        frame = data.get('frame')
+
         redirect_url = f"https://qr-code-generator-python3.onrender.com/r/{short_id}"
         qr = segno.make(redirect_url, error='h')
         out = io.BytesIO()
         qr.save(out, kind='png', scale=10, dark=dark, light=light)
         img_str = f"data:image/png;base64,{base64.b64encode(out.getvalue()).decode('utf-8')}"
-        qrcodes_collection.update_one({"id": short_id}, {"$set": {"color": dark, "bg_color": light, "qrImageUrl": img_str}})
+
+        qrcodes_collection.update_one(
+            {"id": short_id},
+            {"$set": {"color": dark, "bg_color": light, "qrImageUrl": img_str, "design": design, "frame": frame}}
+        )
         return jsonify({"status": "ok", "newImageUrl": img_str}), 200
     except Exception as e: return jsonify({"error": str(e)}), 500
 
