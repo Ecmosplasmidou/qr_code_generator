@@ -84,8 +84,8 @@ def create_checkout(current_user):
             }],
             mode='subscription',
             customer_email=current_user['email'],
-            success_url="https://votre-site.com/app?payment=success",
-            cancel_url="https://votre-site.com/upgrade",
+            success_url="http://localhost:5173/app?payment=success",
+            cancel_url="http://localhost:5173/upgrade",
         )
         return jsonify({'url': session.url})
     except Exception as e:
