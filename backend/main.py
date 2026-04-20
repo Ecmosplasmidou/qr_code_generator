@@ -102,14 +102,19 @@ def webhook():
 
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        customer_details = getattr(session, 'customer_details', None)
-        customer_email = customer_details.get('email') if customer_details else None
+        
+        # Accès direct aux attributs de l'objet Stripe
+        try:
+            customer_email = session.customer_details.email
+        except AttributeError:
+            customer_email = None
         
         if customer_email:
             users_collection.update_one(
                 {"email": customer_email},
                 {"$set": {"is_pro": True}}
             )
+            
     return "Success", 200
 
 @app.route('/generate', methods=['POST'])
