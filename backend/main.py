@@ -101,19 +101,28 @@ def create_checkout(current_user):
 def webhook():
     payload = request.get_data()
     sig_header = request.headers.get('Stripe-Signature')
+    
+    print("🔔 Webhook reçu !") # Log de debug
     try:
-        event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
+        )
     except Exception as e:
+        print(f"❌ Erreur de signature Webhook : {e}")
         return jsonify(message="Invalid Webhook Signature"), 400
-
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         customer_email = session.get('customer_details', {}).get('email')
+        print(f"💳 Paiement réussi pour : {customer_email}") # Log de debug
         if customer_email:
-            users_collection.update_one(
+            result = users_collection.update_one(
                 {"email": customer_email},
                 {"$set": {"is_pro": True}}
             )
+            if result.modified_count > 0:
+                print(f"✅ Utilisateur {customer_email} passé en PRO en base.")
+            else:
+                print(f"⚠️ Utilisateur {customer_email} non trouvé en base ou déjà PRO.")
     return "Success", 200
 
 # --- GÉNÉRATION QR & LIENS ---
