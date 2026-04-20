@@ -10,7 +10,6 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# --- CONFIGURATION ---
 SECRET_KEY = os.environ.get("SECRET_KEY")
 MONGO_URI = os.environ.get("MONGO_URI")
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
@@ -21,7 +20,6 @@ db = client['qr_database']
 qrcodes_collection = db['qrcodes']
 users_collection = db['users']
 
-# --- DÉCORATEUR DE PROTECTION ---
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -38,7 +36,6 @@ def token_required(f):
         return f(current_user, *args, **kwargs)
     return decorated
 
-# --- AUTHENTIFICATION ---
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
@@ -70,7 +67,6 @@ def login():
         }), 200
     return jsonify({"message": "Identifiants incorrects"}), 401
 
-# --- STRIPE : CRÉATION DU PAIEMENT ---
 @app.route('/create-checkout-session', methods=['POST'])
 @token_required
 def create_checkout(current_user):
@@ -88,7 +84,6 @@ def create_checkout(current_user):
             }],
             mode='subscription',
             customer_email=current_user['email'],
-            # REMPLACE CES URLS PAR TON URL FRONTEND (ex: https://ton-site.vercel.app)
             success_url="http://localhost:5173/app?payment=success",
             cancel_url="http://localhost:5173/upgrade",
         )
@@ -96,36 +91,27 @@ def create_checkout(current_user):
     except Exception as e:
         return jsonify(error=str(e)), 500
 
-# --- STRIPE : WEBHOOK (LIAISON AUTOMATIQUE) ---
 @app.route('/webhook', methods=['POST'])
 def webhook():
     payload = request.get_data()
     sig_header = request.headers.get('Stripe-Signature')
-    
-    print("🔔 Webhook reçu !") # Log de debug
     try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, STRIPE_WEBHOOK_SECRET
-        )
+        event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
     except Exception as e:
-        print(f"❌ Erreur de signature Webhook : {e}")
         return jsonify(message="Invalid Webhook Signature"), 400
+
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        customer_email = session.get('customer_details', {}).get('email')
-        print(f"💳 Paiement réussi pour : {customer_email}") # Log de debug
+        customer_details = getattr(session, 'customer_details', None)
+        customer_email = customer_details.get('email') if customer_details else None
+        
         if customer_email:
-            result = users_collection.update_one(
+            users_collection.update_one(
                 {"email": customer_email},
                 {"$set": {"is_pro": True}}
             )
-            if result.modified_count > 0:
-                print(f"✅ Utilisateur {customer_email} passé en PRO en base.")
-            else:
-                print(f"⚠️ Utilisateur {customer_email} non trouvé en base ou déjà PRO.")
     return "Success", 200
 
-# --- GÉNÉRATION QR & LIENS ---
 @app.route('/generate', methods=['POST'])
 @token_required
 def generate_entry(current_user):
