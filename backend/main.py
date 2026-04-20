@@ -10,6 +10,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
+# --- CONFIGURATION ---
 SECRET_KEY = os.environ.get("SECRET_KEY")
 MONGO_URI = os.environ.get("MONGO_URI")
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
@@ -20,6 +21,7 @@ db = client['qr_database']
 qrcodes_collection = db['qrcodes']
 users_collection = db['users']
 
+# --- DÉCORATEUR DE PROTECTION ---
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -36,6 +38,7 @@ def token_required(f):
         return f(current_user, *args, **kwargs)
     return decorated
 
+# --- AUTHENTIFICATION ---
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
@@ -67,6 +70,7 @@ def login():
         }), 200
     return jsonify({"message": "Identifiants incorrects"}), 401
 
+# --- STRIPE : CRÉATION DU PAIEMENT ---
 @app.route('/create-checkout-session', methods=['POST'])
 @token_required
 def create_checkout(current_user):
@@ -76,14 +80,15 @@ def create_checkout(current_user):
             line_items=[{
                 'price_data': {
                     'currency': 'eur',
-                    'product_data': {'name': 'QRLYZE PRO'},
-                    'unit_amount': 200,
+                    'product_data': {'name': 'QRLYZE PRO - Accès Illimité'},
+                    'unit_amount': 200, 
                     'recurring': {'interval': 'month'},
                 },
                 'quantity': 1,
             }],
             mode='subscription',
             customer_email=current_user['email'],
+            # REMPLACE CES URLS PAR TON URL FRONTEND (ex: https://ton-site.vercel.app)
             success_url="http://localhost:5173/app?payment=success",
             cancel_url="http://localhost:5173/upgrade",
         )
@@ -91,23 +96,27 @@ def create_checkout(current_user):
     except Exception as e:
         return jsonify(error=str(e)), 500
 
+# --- STRIPE : WEBHOOK (LIAISON AUTOMATIQUE) ---
 @app.route('/webhook', methods=['POST'])
 def webhook():
     payload = request.get_data()
     sig_header = request.headers.get('Stripe-Signature')
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
-    except:
-        return jsonify(message="Invalid Webhook"), 400
+    except Exception as e:
+        return jsonify(message="Invalid Webhook Signature"), 400
 
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        users_collection.update_one(
-            {"email": session['customer_details']['email']},
-            {"$set": {"is_pro": True}}
-        )
+        customer_email = session.get('customer_details', {}).get('email')
+        if customer_email:
+            users_collection.update_one(
+                {"email": customer_email},
+                {"$set": {"is_pro": True}}
+            )
     return "Success", 200
 
+# --- GÉNÉRATION QR & LIENS ---
 @app.route('/generate', methods=['POST'])
 @token_required
 def generate_entry(current_user):
