@@ -67,7 +67,7 @@ const LandingPage = () => {
           <h1 className="text-5xl sm:text-7xl lg:text-9xl font-black tracking-tighter leading-[0.9] md:leading-[0.85] drop-shadow-sm px-2">
             Créez votre <br />
             <span className="text-blue-600 italic font-black relative inline-block">
-              Code QR.
+              QR Code.
               <Sparkles className="absolute -top-4 -right-6 md:-top-6 md:-right-10 text-amber-400 opacity-80 w-6 h-6 md:w-10 md:h-10" />
             </span>
           </h1>
@@ -110,7 +110,7 @@ const LandingPage = () => {
                   )}
                 </div>
                 <div className="flex items-center gap-2 text-slate-400 font-bold text-[9px] md:text-[10px] uppercase tracking-widest bg-slate-50 w-fit px-3 py-2 md:px-4 md:py-2 rounded-xl">
-                  <Info size={14} className="text-blue-600 shrink-0" /> Votre code QR est généré instantanément
+                  <Info size={14} className="text-blue-600 shrink-0" /> Votre QR code est généré instantanément
                 </div>
               </div>
 
@@ -143,7 +143,7 @@ const LandingPage = () => {
 
         {/* HOW TO SECTION */}
         <section className="space-y-12 md:space-y-20 relative">
-          <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-center px-4">Comment créer un code QR ?</h2>
+          <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-center px-4">Comment créer un QR code ?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 relative z-10">
             <Step number="1" title="Sélectionnez" desc="Choisissez le type de contenu (URL, vCard, PDF) adapté à votre besoin." />
             <Step number="2" title="Générez" desc="Remplissez les champs nécessaires. Le code se met à jour en temps réel." />
