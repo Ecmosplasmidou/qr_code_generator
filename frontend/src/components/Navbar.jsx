@@ -2,6 +2,8 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { QrCode, ShieldCheck, User, LogOut, BarChart3, LayoutGrid } from 'lucide-react';
 
+import QrLyzer_logo from '../assets/favicon_qrlyzer-removebg.png'
+
 const Navbar = ({ isPro }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,8 +22,12 @@ const Navbar = ({ isPro }) => {
         
         {/* LOGO */}
         <Link to="/" className="flex items-center gap-3 group z-10 shrink-0">
-          <div className="bg-blue-600 p-2 md:p-2.5 rounded-xl text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300">
-            <QrCode size={20} className="md:w-[22px] md:h-[22px]" strokeWidth={2.5}/>
+          <div className="relative w-9 h-9 md:w-10 md:h-10 shrink-0 overflow-hidden rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.4)] group-hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300">
+            <img 
+              src={QrLyzer_logo} 
+              alt="QrLyzer Logo" 
+              className="w-full h-full  object-cover"
+            />
           </div>
           {/* On masque le texte sur les très petits écrans si besoin, mais sm:block le garde au format tablette+ */}
           <span className="hidden sm:block font-black text-xl text-slate-900 uppercase italic tracking-tighter drop-shadow-sm">
