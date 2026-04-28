@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   RefreshCw, PlusCircle, Palette, ImageIcon, 
-  Layers, Eye, QrCode, UserPlus, Link as LinkIcon 
+  Layers, Eye, QrCode, UserPlus, Text, Link as LinkIcon 
 } from 'lucide-react';
 import QRVisual from '../components/QRVisual';
 import CustomPicker from '../components/CustomPicker';
@@ -83,14 +83,15 @@ const DashboardPage = ({ history, fetchHistory, openDeleteModal }) => {
   // --- LOGIQUE DE FILTRAGE PAR ONGLET ---
   const filteredHistory = history.filter(item => {
     if (genType === 'vcard') return item.type === 'vcard';
+    if (genType === 'texte') return item.type === 'texte';
     if (genType === 'link') return item.type === 'link' || item.type === 'liens';
-    // Par défaut QR CODES
     return item.type === 'qr' || item.type === 'qr codes' || !item.type;
   });
 
   const getDisplayTitle = () => {
     if (genType === 'qr') return 'QR CODES';
     if (genType === 'vcard') return 'CARTES DE VISITE';
+    if (genType === 'texte') return 'TEXTE';
     if (genType === 'link') return 'LIENS';
     return genType.toUpperCase();
   };
@@ -119,6 +120,9 @@ const DashboardPage = ({ history, fetchHistory, openDeleteModal }) => {
             <button onClick={() => { setGenType('vcard'); setShowOptions(false); }} className={`flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[10px] font-black transition-all duration-300 whitespace-nowrap flex items-center justify-center gap-2 ${genType === 'vcard' ? 'bg-blue-600 text-white shadow-md scale-105' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900'}`}>
               <UserPlus size={16}/> VCARDS
             </button>
+            <button onClick={() => { setGenType('texte'); setShowOptions(false); }} className={`flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[10px] font-black transition-all duration-300 whitespace-nowrap flex items-center justify-center gap-2 ${genType === 'texte' ? 'bg-blue-600 text-white shadow-md scale-105' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900'}`}>
+              <Text size={16}/> TEXTE
+            </button>
             <button onClick={() => { setGenType('link'); setShowOptions(false); }} className={`flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[10px] font-black transition-all duration-300 whitespace-nowrap flex items-center justify-center gap-2 ${genType === 'link' ? 'bg-blue-600 text-white shadow-md scale-105' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900'}`}>
               <LinkIcon size={16}/> LIENS
             </button>
@@ -139,6 +143,10 @@ const DashboardPage = ({ history, fetchHistory, openDeleteModal }) => {
                <input type="tel" placeholder="Numéro de téléphone" className="w-full px-6 py-5 rounded-2xl bg-slate-50 outline-none font-bold text-sm border border-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner" value={vCard.phone} onChange={e => setVCard({...vCard, phone: e.target.value})} />
                <input type="email" placeholder="Adresse Email" className="w-full px-6 py-5 rounded-2xl bg-slate-50 outline-none font-bold text-sm border border-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner" value={vCard.email} onChange={e => setVCard({...vCard, email: e.target.value})} />
                <input type="url" placeholder="Lien (Site, Portfolio...)" className="w-full px-6 py-5 rounded-2xl bg-slate-50 outline-none font-bold text-sm border border-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner" value={vCard.website} onChange={e => setVCard({...vCard, website: e.target.value})} />
+            </div>
+          ) : genType === 'texte' ?(
+          <div className="space-y-2 animate-in slide-in-from-top-4 duration-500">
+              <input type="text" required placeholder="Entrez le texte d evotre choix..." className="w-full px-6 md:px-8 py-6 rounded-[2rem] bg-slate-50 outline-none font-black text-sm md:text-base border border-slate-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all shadow-inner" value={url} onChange={(e) => setUrl(e.target.value)} />
             </div>
           ) : (
             <div className="space-y-2 animate-in slide-in-from-top-4 duration-500">

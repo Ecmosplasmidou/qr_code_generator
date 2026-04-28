@@ -19,6 +19,7 @@ const AnalyticsPage = ({ history }) => {
   const totalVisits = history.reduce((acc, curr) => acc + (curr.scanCount || 0), 0);
   const qrData = history.filter(i => i.type === 'qr' || !i.type);
   const vcardData = history.filter(i => i.type === 'vcard');
+  const texteData = history.filter(i => i.type === 'texte')
   const linkData = history.filter(i => i.type === 'link');
   
   const topPerformer = [...history].sort((a,b) => b.scanCount - a.scanCount)[0];
@@ -101,6 +102,7 @@ const AnalyticsPage = ({ history }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard icon={<QrCode size={16}/>} label="QR Codes" count={qrData.length} color="blue" />
         <StatCard icon={<UserPlus size={16}/>} label="vCards" count={vcardData.length} color="emerald" />
+        <StatCard icon={<UserPlus size={16}/>} label="Texte" count={texteData.length} color="slate" />
         <StatCard icon={<LinkIcon size={16}/>} label="Liens Suivis" count={linkData.length} color="indigo" />
         
         <div className="bg-gradient-to-br from-amber-100 to-orange-50 p-8 rounded-[2.5rem] border border-amber-200 shadow-sm flex flex-col justify-center relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
@@ -132,6 +134,7 @@ const AnalyticsPage = ({ history }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
         <DataColumn title="QR Codes" icon={<QrCode size={20}/>} data={qrData} color="blue" />
         <DataColumn title="Contacts" icon={<UserPlus size={20}/>} data={vcardData} color="emerald" />
+        <DataColumn title="Texte" icon={<UserPlus size={20}/>} data={texteData} color="slate" />
         <DataColumn title="Liens" icon={<LinkIcon size={20}/>} data={linkData} color="indigo" />
       </div>
 
@@ -144,6 +147,7 @@ const StatCard = ({ icon, label, count, color }) => {
     blue: "text-blue-600 bg-blue-50 border-blue-100",
     emerald: "text-emerald-600 bg-emerald-50 border-emerald-100",
     indigo: "text-indigo-600 bg-indigo-50 border-indigo-100",
+    slate: "text-slate-600 bg-slate-50 border-slate-100"
   };
   
   return (
@@ -165,7 +169,8 @@ const DataColumn = ({ title, icon, data, color }) => {
   const colorMap = {
     blue: "text-blue-600 border-blue-100",
     emerald: "text-emerald-600 border-emerald-100",
-    indigo: "text-indigo-600 border-indigo-100"
+    indigo: "text-indigo-600 border-indigo-100",
+    slate: "text-slate-600 bg-slate-600"
   };
 
   const badgeColors = {
