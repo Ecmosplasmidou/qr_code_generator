@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { QrCode, Zap, ShieldCheck } from 'lucide-react';
 
+import QrLyzer_logo from '../assets/favicon_qrlyzer-removebg.png';
+
 const Footer = () => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const location = useLocation();
@@ -21,8 +23,12 @@ const Footer = () => {
           {/* COLONNE BRANDING */}
           <div className="md:col-span-5 space-y-6">
             <Link to="/" className="inline-flex items-center gap-3 group">
-              <div className="bg-blue-600 p-2 rounded-xl text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                <QrCode size={20} strokeWidth={2.5} />
+              <div className="relative w-9 h-9 md:w-10 md:h-10 shrink-0 overflow-hidden rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.4)] group-hover:shadow-[0_0_20px_rgba(37,99,235,0.6)] group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300">
+                <img 
+                  src={QrLyzer_logo} 
+                  alt="QrLyzer Logo" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="font-black text-2xl italic uppercase tracking-tighter drop-shadow-md">
                 QR<span className="text-blue-500">LYZE</span>
