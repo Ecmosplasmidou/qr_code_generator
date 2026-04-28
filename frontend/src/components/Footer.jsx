@@ -86,10 +86,6 @@ const Footer = () => {
           <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em]">
             © {new Date().getFullYear()} QRLYZE . TOUS DROITS RÉSERVÉS.
           </p>
-          <div className="flex gap-6 text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em]">
-            <span className="cursor-pointer hover:text-slate-300 transition-colors">Confidentialité</span>
-            <span className="cursor-pointer hover:text-slate-300 transition-colors">CGU</span>
-          </div>
         </div>
       </div>
     </footer>
