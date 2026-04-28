@@ -239,7 +239,6 @@ const LandingPage = () => {
   );
 };
 
-// COMPOSANTS INTERNES
 const TabItem = ({ active, onClick, icon, label }) => (
   <button onClick={onClick} className={`shrink-0 snap-center flex items-center gap-2 px-5 py-3 md:px-6 md:py-3.5 rounded-xl text-[10px] md:text-[11px] font-black transition-all ${active ? 'bg-slate-900 text-white shadow-xl scale-105' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}>
     {icon} {label}

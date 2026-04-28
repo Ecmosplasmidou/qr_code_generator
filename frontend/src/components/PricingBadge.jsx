@@ -11,7 +11,6 @@ const PricingBadge = () => {
     if (token && token !== "null" && token !== "undefined") {
       setIsVisible(false);
     } else {
-      // Léger délai pour une apparition plus élégante après le chargement de la page
       const timer = setTimeout(() => setIsVisible(true), 800);
       return () => clearTimeout(timer);
     }

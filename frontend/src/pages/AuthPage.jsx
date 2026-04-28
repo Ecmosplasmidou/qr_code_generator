@@ -5,16 +5,12 @@ import { Mail, Lock, ArrowRight, ShieldCheck, Eye, EyeOff, X, CheckCircle2, Aler
 const AuthPage = ({ onLoginSuccess }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-
-  // On initialise l'état, par défaut sur Connexion
   const [isLogin, setIsLogin] = useState(true);
-  
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [notif, setNotif] = useState(null);
 
-  // Synchronisation avec l'URL : Détecte quand on vient de la Navbar
   useEffect(() => {
     const mode = searchParams.get('mode');
     if (mode === 'register') {
@@ -47,7 +43,6 @@ const AuthPage = ({ onLoginSuccess }) => {
 
           navigate(data.is_pro ? '/app' : '/upgrade');
         } else {
-          // Inscription réussie : on redirige vers l'onglet login
           setSearchParams({ mode: 'login' });
           setNotif({ type: 'success', msg: 'Compte créé ! Connectez-vous.' });
         }

@@ -80,7 +80,6 @@ const DashboardPage = ({ history, fetchHistory, openDeleteModal }) => {
     if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
   };
 
-  // --- LOGIQUE DE FILTRAGE PAR ONGLET ---
   const filteredHistory = history.filter(item => {
     if (genType === 'vcard') return item.type === 'vcard';
     if (genType === 'texte') return item.type === 'texte';

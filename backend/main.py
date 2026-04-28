@@ -111,7 +111,6 @@ def webhook():
                 )
         except AttributeError:
             pass
-
     return "Success", 200
 
 @app.route('/generate', methods=['POST'])
