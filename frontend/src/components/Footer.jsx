@@ -69,10 +69,6 @@ const Footer = () => {
           <p className="text-[9px] font-bold text-slate-600 uppercase tracking-[0.2em]">
             © {new Date().getFullYear()} QRLYZE
           </p>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/5">
-             <ShieldCheck size={12} className="text-blue-500" />
-             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Secured by JWT & Bcrypt</span>
-          </div>
         </div>
       </div>
     </footer>

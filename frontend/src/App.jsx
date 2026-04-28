@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AlertTriangle, ShieldCheck } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
-// Pages
 import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
 import AnalyticsPage from './pages/AnalyticsPage';
@@ -11,7 +10,6 @@ import AuthPage from './pages/AuthPage';
 import AccountPage from './pages/AccountPage';
 import UpgradePage from './pages/UpgradePage';
 
-// Components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
@@ -19,20 +17,13 @@ import PricingBadge from './components/PricingBadge';
 
 const API_URL = "https://qr-code-generator-python3.onrender.com";
 
-// --- LOGIQUE DE PROTECTION DES ROUTES ---
-const PrivateRoute = ({ children, proOnly = false }) => {
-  const token = localStorage.getItem('token');
-  const isPro = localStorage.getItem('isPro') === 'true';
-  if (!token) return <Navigate to="/auth" />;
-  if (proOnly && !isPro) return <Navigate to="/upgrade" />; 
-
-  return children;
-};
-
 function App() {
   const [history, setHistory] = useState([]);
   const [deleteId, setDeleteId] = useState(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  
+  // ON UTILISE UN STATE POUR RENDRE LE STATUT PRO RÉACTIF
+  const [isPro, setIsPro] = useState(localStorage.getItem('isPro') === 'true');
 
   const fetchHistory = async () => {
     const token = localStorage.getItem('token');
@@ -62,6 +53,14 @@ function App() {
   };
 
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success') {
+      // ON MET À JOUR LE STORAGE + LE STATE SIMULTANÉMENT
+      localStorage.setItem('isPro', 'true');
+      setIsPro(true); 
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     fetchHistory();
     const safetyTimeout = setTimeout(() => setIsInitialLoading(false), 3500);
     return () => clearTimeout(safetyTimeout);
@@ -83,6 +82,19 @@ function App() {
     }
   };
 
+const handleLoginSuccess = () => {
+  const proStatus = localStorage.getItem('isPro') === 'true';
+  setIsPro(proStatus);
+  fetchHistory();
+};
+
+  const PrivateRoute = ({ children, proOnly = false }) => {
+    const token = localStorage.getItem('token');
+    if (!token) return <Navigate to="/auth" />;
+    if (proOnly && !isPro) return <Navigate to="/upgrade" />; 
+    return children;
+  };
+
   if (isInitialLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -98,31 +110,28 @@ function App() {
     <Router>
       <ScrollToTop />
       <div className="min-h-screen flex flex-col bg-slate-50 font-sans antialiased">
-        <Navbar />
+        <Navbar isPro={isPro} />
 
         <div className="flex-1">
           <Routes>
-            {/* --- ROUTES PUBLIQUES --- */}
             <Route path="/" element={<LandingPage />} />
-            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/auth" element={<AuthPage onLoginSuccess={handleLoginSuccess} />} />
 
-            {/* --- ROUTES PRIVÉES (Utilisateur connecté) --- */}
             <Route path="/account" element={
               <PrivateRoute>
-                <AccountPage history={history} />
+                <AccountPage history={history} isPro={isPro} />
               </PrivateRoute>
             } />
 
             <Route path="/upgrade" element={
               <PrivateRoute>
-                <UpgradePage />
+                {isPro ? <Navigate to="/app" /> : <UpgradePage />}
               </PrivateRoute>
             } />
 
-            {/* --- ROUTES PRO ONLY (Abonnement requis) --- */}
             <Route path="/app" element={
               <PrivateRoute proOnly>
-                <DashboardPage history={history} fetchHistory={fetchHistory} openDeleteModal={setDeleteId} />
+                <DashboardPage isPro={isPro} history={history} fetchHistory={fetchHistory} openDeleteModal={setDeleteId} />
               </PrivateRoute>
             } />
             
@@ -144,7 +153,6 @@ function App() {
 
         <Footer />
 
-        {/* --- MODALE DE SUPPRESSION --- */}
         {deleteId && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
             <div className="bg-white p-10 md:p-12 rounded-[3rem] text-center max-w-sm shadow-2xl animate-in zoom-in duration-300">
@@ -167,8 +175,7 @@ function App() {
           </div>
         )}
 
-        {/* Badge de prix flottant (Auto-masqué si connecté Pro) */}
-        <PricingBadge />
+        <PricingBadge isPro={isPro} />
       </div>
     </Router>
   );

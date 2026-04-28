@@ -2,11 +2,11 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { QrCode, ShieldCheck, User, LogOut, BarChart3, LayoutGrid } from 'lucide-react';
 
-const Navbar = () => {
-  const isPro = localStorage.getItem('isPro') === 'true';
+const Navbar = ({ isPro }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const token = localStorage.getItem('token');
+  const displayEmail = localStorage.getItem('email'); 
 
   const handleLogout = () => {
     localStorage.clear();
@@ -16,7 +16,6 @@ const Navbar = () => {
 
   return (
     <header className="bg-white/90 border-b sticky top-0 z-50 px-4 md:px-10 h-20 flex items-center justify-between backdrop-blur-md">
-      {/* LOGO */}
       <Link to="/" className="flex items-center gap-3 group">
         <div className="bg-blue-600 p-2 rounded-xl text-white shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform">
           <QrCode size={24}/>
@@ -24,7 +23,6 @@ const Navbar = () => {
         <span className="font-black text-xl text-slate-900 uppercase italic tracking-tighter">QRLYZE</span>
       </Link>
 
-      {/* NAV CENTRALE (Connecté) */}
       {token && (
         <nav className="hidden md:flex items-center gap-8">
           <NavLink to="/app" active={location.pathname === '/app'} icon={<LayoutGrid size={16}/>} label="Studio" />
@@ -47,7 +45,7 @@ const Navbar = () => {
                 <p className="text-[9px] font-black uppercase text-blue-600">Premium</p>
               )}
               <p className="text-[10px] font-bold text-slate-900 truncate max-w-[120px]">
-                {localStorage.getItem('userEmail')}
+                {displayEmail}
               </p>
             </div>
             
