@@ -189,7 +189,7 @@ const DashboardPage = ({ history, fetchHistory, openDeleteModal }) => {
                {/* COULEURS & SLIDER */}
                <div className="col-span-1 space-y-6 md:space-y-8">
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <CustomPicker label="Code QR" color={qrColor} onChange={setQrColor} />
+                    <CustomPicker label="QR Code" color={qrColor} onChange={setQrColor} />
                     <CustomPicker label="Arrière-plan" color={bgColor} onChange={setBgColor} />
                   </div>
                   <div className="space-y-4 bg-white p-5 md:p-6 rounded-3xl border border-slate-100 shadow-sm">
@@ -228,7 +228,7 @@ const DashboardPage = ({ history, fetchHistory, openDeleteModal }) => {
                <div className="col-span-1 md:col-span-2 lg:col-span-1 flex flex-col items-center justify-center bg-white p-6 md:p-8 rounded-[2.5rem] shadow-xl border border-slate-100 relative min-h-[250px] md:min-h-[300px] overflow-hidden group">
                   <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-30"></div>
                   <div className="absolute top-4 left-4 bg-slate-900 text-white px-3 py-1.5 rounded-full text-[8px] font-black tracking-widest shadow-lg flex items-center gap-2 z-10">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div> RENDU LIVE
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div> PREVIEW
                   </div>
                   
                   <div className="relative z-10 transform lg:group-hover:scale-105 transition-transform duration-500 mt-6 md:mt-4">

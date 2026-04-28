@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Zap, Smartphone, MapPin, Activity, Globe, Link as LinkIcon, RefreshCw, Calendar } from 'lucide-react';
+import { ArrowLeft, Zap, Smartphone, MapPin, Activity, Globe, Link as LinkIcon, RefreshCw, Calendar, ShieldCheck  } from 'lucide-react';
 import QRVisual from '../components/QRVisual';
 
 const API_URL = "https://qr-code-generator-python3.onrender.com";
