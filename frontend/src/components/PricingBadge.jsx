@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
+import { useLocation, Link } from 'react-router-dom';
+import { ShieldCheck, ArrowRight } from 'lucide-react';
 
 const PricingBadge = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -11,22 +11,39 @@ const PricingBadge = () => {
     if (token && token !== "null" && token !== "undefined") {
       setIsVisible(false);
     } else {
-      setIsVisible(true);
+      // Léger délai pour une apparition plus élégante après le chargement de la page
+      const timer = setTimeout(() => setIsVisible(true), 800);
+      return () => clearTimeout(timer);
     }
   }, [location]);
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-8 right-8 z-[100] animate-bounce pointer-events-none">
-      <div className="bg-slate-900 text-white px-6 py-4 rounded-3xl shadow-2xl border-2 border-blue-600 flex items-center gap-4 pointer-events-auto">
-        <div className="bg-blue-600 p-2 rounded-xl text-white">
-          <ShieldCheck size={20} />
+    <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[100] animate-in slide-in-from-bottom-10 fade-in duration-700 pointer-events-none">
+      <Link 
+        to="/auth" 
+        className="group relative flex items-center gap-4 bg-slate-900/90 backdrop-blur-xl p-2 pr-6 rounded-full shadow-[0_20px_40px_-10px_rgba(37,99,235,0.4)] border border-white/10 hover:border-blue-500/50 hover:shadow-[0_20px_50px_-10px_rgba(37,99,235,0.6)] transition-all duration-500 hover:-translate-y-1 pointer-events-auto overflow-hidden"
+      >
+        {/* Glow effect interne au survol */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        {/* Icône */}
+        <div className="relative w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-inner group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500">
+          <ShieldCheck size={22} strokeWidth={2.5} />
         </div>
-        <div>
-          <p className="text-sm font-black uppercase italic leading-none">QRLYZE PRO : 2€/MOIS</p>
+        
+        {/* Textes */}
+        <div className="relative flex flex-col justify-center">
+          <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-0.5">
+            Débloquez tout le potentiel
+          </span>
+          <span className="text-[13px] md:text-sm font-black text-white uppercase italic tracking-tighter flex items-center gap-2">
+            QRLYZE PRO : 2€/MOIS
+            <ArrowRight size={14} className="text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
+          </span>
         </div>
-      </div>
+      </Link>
     </div>
   );
 };

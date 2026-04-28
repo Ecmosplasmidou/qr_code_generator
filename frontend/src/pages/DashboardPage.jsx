@@ -22,17 +22,16 @@ const EYE_SHAPES = [
 ];
 
 const DashboardPage = ({ history, fetchHistory, openDeleteModal }) => {
-  // On utilise des identifiants simplifiés pour l'état interne
   const [genType, setGenType] = useState('qr');
   const [url, setUrl] = useState('');
   const [vCard, setVCard] = useState({ name: '', phone: '', email: '', website: '' });
   const [loading, setLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   
-  const [qrColor, setQrColor] = useState('#000000');
+  const [qrColor, setQrColor] = useState('#0F172A');
   const [bgColor, setBgColor] = useState('#ffffff');
   const [dotType, setDotType] = useState('extra-rounded');
-  const [eyeType, setEyeType] = useState('square');
+  const [eyeType, setEyeType] = useState('extra-rounded');
   const [logoSize, setLogoSize] = useState(0.4);
   const [logo, setLogo] = useState(null);
 
@@ -85,11 +84,10 @@ const DashboardPage = ({ history, fetchHistory, openDeleteModal }) => {
   const filteredHistory = history.filter(item => {
     if (genType === 'vcard') return item.type === 'vcard';
     if (genType === 'link') return item.type === 'link' || item.type === 'liens';
-    // Par défaut QR CODES (inclut les anciens sans type)
+    // Par défaut QR CODES
     return item.type === 'qr' || item.type === 'qr codes' || !item.type;
   });
 
-  // Helper pour l'affichage du titre de section
   const getDisplayTitle = () => {
     if (genType === 'qr') return 'QR CODES';
     if (genType === 'vcard') return 'CARTES DE VISITE';
@@ -98,89 +96,112 @@ const DashboardPage = ({ history, fetchHistory, openDeleteModal }) => {
   };
 
   return (
-    <main className="max-w-6xl mx-auto px-4 md:px-6 py-10 animate-in fade-in duration-500">
+    <main className="relative max-w-6xl mx-auto px-4 md:px-6 py-12 animate-in fade-in duration-500 min-h-screen">
       
-      <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+      {/* Background Decor (Subtle Glows) */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-100/40 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+      <div className="absolute top-40 left-0 w-[300px] h-[300px] bg-indigo-100/40 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+
+      {/* HEADER STUDIO */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-8 relative z-10">
         <div className="text-center md:text-left">
-          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter italic text-slate-900 leading-none">Studio</h1>
-          <p className="text-slate-400 font-black uppercase text-[9px] md:text-[10px] tracking-[0.2em] mt-3">Design & Smart Tracking</p>
+          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter italic text-slate-900 leading-none drop-shadow-sm">
+            Studio <span className="text-blue-600">Pro</span>
+          </h1>
+          <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.25em] mt-3">Design & Smart Tracking</p>
         </div>
         
-        <div className="flex bg-slate-200 p-1.5 rounded-2xl gap-1 w-full md:w-auto shadow-inner overflow-x-auto no-scrollbar">
-            <button onClick={() => { setGenType('qr'); setShowOptions(false); }} className={`flex-1 md:flex-none px-5 py-3 rounded-xl text-[10px] font-black transition-all whitespace-nowrap flex items-center justify-center gap-2 ${genType === 'qr' ? 'bg-white text-blue-600 shadow-md' : 'text-slate-500'}`}>
-              <QrCode size={14}/>QR CODES
+        {/* TABS NAVIGATION */}
+        <div className="flex bg-white/60 backdrop-blur-md p-1.5 rounded-[1.5rem] gap-1 w-full md:w-auto shadow-sm border border-slate-100 overflow-x-auto no-scrollbar">
+            <button onClick={() => { setGenType('qr'); setShowOptions(false); }} className={`flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[10px] font-black transition-all duration-300 whitespace-nowrap flex items-center justify-center gap-2 ${genType === 'qr' ? 'bg-blue-600 text-white shadow-md scale-105' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900'}`}>
+              <QrCode size={16}/> QR CODES
             </button>
-            <button onClick={() => { setGenType('vcard'); setShowOptions(false); }} className={`flex-1 md:flex-none px-5 py-3 rounded-xl text-[10px] font-black transition-all whitespace-nowrap flex items-center justify-center gap-2 ${genType === 'vcard' ? 'bg-white text-blue-600 shadow-md' : 'text-slate-500'}`}>
-              <UserPlus size={14}/>CARTES DE VISITE
+            <button onClick={() => { setGenType('vcard'); setShowOptions(false); }} className={`flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[10px] font-black transition-all duration-300 whitespace-nowrap flex items-center justify-center gap-2 ${genType === 'vcard' ? 'bg-blue-600 text-white shadow-md scale-105' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900'}`}>
+              <UserPlus size={16}/> VCARDS
             </button>
-            <button onClick={() => { setGenType('link'); setShowOptions(false); }} className={`flex-1 md:flex-none px-5 py-3 rounded-xl text-[10px] font-black transition-all whitespace-nowrap flex items-center justify-center gap-2 ${genType === 'link' ? 'bg-white text-blue-600 shadow-md' : 'text-slate-500'}`}>
-              <LinkIcon size={14}/>LIENS
+            <button onClick={() => { setGenType('link'); setShowOptions(false); }} className={`flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[10px] font-black transition-all duration-300 whitespace-nowrap flex items-center justify-center gap-2 ${genType === 'link' ? 'bg-blue-600 text-white shadow-md scale-105' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900'}`}>
+              <LinkIcon size={16}/> LIENS
             </button>
         </div>
       </div>
 
-      <div className="bg-white p-6 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl border-t-[12px] border-blue-600 mb-16">
-        <form onSubmit={onGenerate} className="space-y-5">
+      {/* GENERATOR BOX */}
+      <div className="relative bg-white/80 backdrop-blur-2xl p-6 md:p-12 rounded-[3rem] md:rounded-[4rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-white mb-16 z-10 overflow-hidden">
+        {/* Liseré design supérieur */}
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+
+        <form onSubmit={onGenerate} className="space-y-8 mt-2">
           
+          {/* INPUTS AREA */}
           {genType === 'vcard' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-in slide-in-from-top-4">
-               <input type="text" required placeholder="Nom complet *" className="w-full px-6 py-4 rounded-2xl bg-slate-50 outline-none font-bold border-2 border-transparent focus:border-blue-500 transition-all shadow-inner" value={vCard.name} onChange={e => setVCard({...vCard, name: e.target.value})} />
-               <input type="tel" placeholder="Numéro de téléphone" className="w-full px-6 py-4 rounded-2xl bg-slate-50 outline-none font-bold border-2 border-transparent focus:border-blue-500 transition-all shadow-inner" value={vCard.phone} onChange={e => setVCard({...vCard, phone: e.target.value})} />
-               <input type="email" placeholder="Adresse Email" className="w-full px-6 py-4 rounded-2xl bg-slate-50 outline-none font-bold border-2 border-transparent focus:border-blue-500 transition-all shadow-inner" value={vCard.email} onChange={e => setVCard({...vCard, email: e.target.value})} />
-               <input type="url" placeholder="Lien (Site, Portfolio, etc.)" className="w-full px-6 py-4 rounded-2xl bg-slate-50 outline-none font-bold border-2 border-transparent focus:border-blue-500 transition-all shadow-inner" value={vCard.website} onChange={e => setVCard({...vCard, website: e.target.value})} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in slide-in-from-top-4 duration-500">
+               <input type="text" required placeholder="Nom complet *" className="w-full px-6 py-5 rounded-2xl bg-slate-50 outline-none font-bold text-sm border border-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner" value={vCard.name} onChange={e => setVCard({...vCard, name: e.target.value})} />
+               <input type="tel" placeholder="Numéro de téléphone" className="w-full px-6 py-5 rounded-2xl bg-slate-50 outline-none font-bold text-sm border border-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner" value={vCard.phone} onChange={e => setVCard({...vCard, phone: e.target.value})} />
+               <input type="email" placeholder="Adresse Email" className="w-full px-6 py-5 rounded-2xl bg-slate-50 outline-none font-bold text-sm border border-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner" value={vCard.email} onChange={e => setVCard({...vCard, email: e.target.value})} />
+               <input type="url" placeholder="Lien (Site, Portfolio...)" className="w-full px-6 py-5 rounded-2xl bg-slate-50 outline-none font-bold text-sm border border-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner" value={vCard.website} onChange={e => setVCard({...vCard, website: e.target.value})} />
             </div>
           ) : (
-            <div className="space-y-2">
-              <input type="url" required placeholder="Coller l'URL de destination (https://...)" className="w-full px-6 md:px-8 py-5 rounded-2xl md:rounded-[2rem] bg-slate-50 outline-none font-black text-sm md:text-base border-2 border-transparent focus:border-blue-500 transition-all shadow-inner" value={url} onChange={(e) => setUrl(e.target.value)} />
+            <div className="space-y-2 animate-in slide-in-from-top-4 duration-500">
+              <input type="url" required placeholder="Coller l'URL de destination (https://...)" className="w-full px-6 md:px-8 py-6 rounded-[2rem] bg-slate-50 outline-none font-black text-sm md:text-base border border-slate-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all shadow-inner" value={url} onChange={(e) => setUrl(e.target.value)} />
             </div>
           )}
 
-          <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-            <div className="flex flex-wrap justify-center gap-4">
+          {/* ACTION BUTTONS */}
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-6 pt-4">
+            <div className="flex flex-wrap justify-center gap-4 w-full lg:w-auto">
                {genType !== 'link' && (
                  <>
-                   <button type="button" onClick={() => setShowOptions(!showOptions)} className={`flex items-center gap-2 text-[10px] font-black uppercase px-6 py-4 rounded-2xl transition-all ${showOptions ? 'bg-blue-600 text-white shadow-lg' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}>
+                   <button type="button" onClick={() => setShowOptions(!showOptions)} className={`flex items-center justify-center gap-3 text-[10px] font-black uppercase px-8 py-5 rounded-2xl transition-all duration-300 w-full md:w-auto ${showOptions ? 'bg-slate-900 text-white shadow-xl scale-105' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>
                      <Palette size={16}/> Style & Couleurs
                    </button>
-                   <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase cursor-pointer hover:text-blue-600 bg-slate-50 px-6 py-4 rounded-2xl transition-all border-2 border-dashed border-slate-200">
-                     <ImageIcon size={16}/> {logo ? "Logo OK" : "Logo Central"}
+                   <label className="flex items-center justify-center gap-3 text-[10px] font-black text-slate-500 uppercase cursor-pointer hover:text-blue-600 hover:border-blue-300 bg-white px-8 py-5 rounded-2xl transition-all duration-300 border-2 border-dashed border-slate-200 w-full md:w-auto shadow-sm">
+                     <ImageIcon size={16} className={logo ? "text-emerald-500" : ""}/> {logo ? "Logo Uploadé" : "Ajouter un Logo"}
                      <input type="file" hidden accept="image/*" onChange={handleLogo}/>
                    </label>
                  </>
                )}
             </div>
-            <button disabled={loading} className="w-full lg:w-auto bg-blue-600 text-white px-12 py-5 rounded-[1.5rem] md:rounded-[2rem] font-black text-sm hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50">
-              {loading ? <RefreshCw className="animate-spin" size={20} /> : <><PlusCircle size={24} /> GÉNÉRER MAINTENANT</>}
+            
+            <button disabled={loading} className="w-full lg:w-auto bg-blue-600 text-white px-14 py-5 rounded-[2rem] font-black text-xs tracking-widest uppercase hover:bg-blue-700 transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] hover:-translate-y-1 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0">
+              {loading ? <RefreshCw className="animate-spin" size={20} /> : <><PlusCircle size={20} /> Générer</>}
             </button>
           </div>
 
+          {/* OPTIONS PANEL (GLASSMORPHISM) */}
           {showOptions && genType !== 'link' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 bg-slate-50/50 p-6 md:p-10 rounded-[2.5rem] md:rounded-[3.5rem] border-2 border-dashed border-slate-200 animate-in slide-in-from-top-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 bg-slate-50/80 backdrop-blur-sm p-8 md:p-10 rounded-[3rem] border border-slate-100 shadow-inner animate-in fade-in slide-in-from-top-8 duration-500 mt-8">
+               
+               {/* COULEURS & SLIDER */}
                <div className="lg:col-span-4 space-y-8">
-                  <CustomPicker label="Couleur QR" color={qrColor} onChange={setQrColor} />
-                  <CustomPicker label="Couleur Fond" color={bgColor} onChange={setBgColor} />
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase text-slate-400 flex justify-between tracking-widest italic">Taille Logo <span>{Math.round(logoSize*100)}%</span></label>
-                    <input type="range" min="0.1" max="0.5" step="0.05" value={logoSize} onChange={e => setLogoSize(parseFloat(e.target.value))} className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+                  <div className="flex gap-4">
+                    <CustomPicker label="Code QR" color={qrColor} onChange={setQrColor} />
+                    <CustomPicker label="Arrière-plan" color={bgColor} onChange={setBgColor} />
+                  </div>
+                  <div className="space-y-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                    <label className="text-[10px] font-black uppercase text-slate-400 flex justify-between tracking-widest">
+                      Échelle du Logo <span className="text-blue-600">{Math.round(logoSize*100)}%</span>
+                    </label>
+                    <input type="range" min="0.1" max="0.5" step="0.05" value={logoSize} onChange={e => setLogoSize(parseFloat(e.target.value))} className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600" />
                   </div>
                </div>
                
-               <div className="lg:col-span-5 space-y-8">
+               {/* FORMES */}
+               <div className="lg:col-span-4 space-y-8">
                   <div className="space-y-4">
-                    <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2 tracking-widest"><Layers size={14}/> Style Modules</label>
+                    <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2 tracking-widest ml-2"><Layers size={14}/> Modules (Pixels)</label>
                     <div className="grid grid-cols-2 gap-3">
                       {SHAPES.map(s => (
-                        <button key={s.id} type="button" onClick={() => setDotType(s.type)} className={`py-4 rounded-xl border-2 transition-all text-[10px] font-black uppercase ${dotType === s.type ? 'border-blue-600 bg-white text-blue-600 shadow-md' : 'bg-white/50 border-slate-200 text-slate-400'}`}>
+                        <button key={s.id} type="button" onClick={() => setDotType(s.type)} className={`py-4 rounded-2xl border transition-all duration-300 text-[10px] font-black uppercase tracking-wider ${dotType === s.type ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm scale-[1.02]' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-300 hover:bg-slate-50'}`}>
                           {s.name}
                         </button>
                       ))}
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2 tracking-widest"><Eye size={14}/> Style Yeux</label>
+                    <label className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-2 tracking-widest ml-2"><Eye size={14}/> Angles (Yeux)</label>
                     <div className="grid grid-cols-2 gap-3">
                       {EYE_SHAPES.map(e => (
-                        <button key={e.id} type="button" onClick={() => setEyeType(e.type)} className={`py-4 rounded-xl border-2 transition-all text-[10px] font-black uppercase ${eyeType === e.type ? 'border-blue-600 bg-white text-blue-600 shadow-md' : 'bg-white/50 border-slate-200 text-slate-400'}`}>
+                        <button key={e.id} type="button" onClick={() => setEyeType(e.type)} className={`py-4 rounded-2xl border transition-all duration-300 text-[10px] font-black uppercase tracking-wider ${eyeType === e.type ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm scale-[1.02]' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-300 hover:bg-slate-50'}`}>
                           {e.name}
                         </button>
                       ))}
@@ -188,40 +209,53 @@ const DashboardPage = ({ history, fetchHistory, openDeleteModal }) => {
                   </div>
                </div>
 
-               <div className="lg:col-span-3 flex flex-col items-center justify-center bg-white p-8 rounded-[2.5rem] md:rounded-[3rem] shadow-xl border-2 border-slate-100 relative min-h-[280px]">
-                  <div className="absolute top-5 left-5 bg-blue-600 text-white px-3 py-1 rounded-full text-[9px] font-black shadow-lg animate-pulse">PREVIEW</div>
-                  <QRVisual 
-                    options={{ 
-                      url: genType === 'vcard' ? "BEGIN:VCARD..." : (url || "https://qrlyze.io"), 
-                      color: qrColor, 
-                      bgColor: bgColor, 
-                      dotType, 
-                      eyeType, 
-                      logo, 
-                      logoSize 
-                    }} 
-                    size={160} 
-                  />
-                  <p className="text-[9px] font-black mt-6 text-blue-600 uppercase tracking-widest italic text-center">Live Rendering</p>
+               {/* PREVIEW EN DIRECT */}
+               <div className="lg:col-span-4 flex flex-col items-center justify-center bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 relative min-h-[300px] overflow-hidden group">
+                  <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-30"></div>
+                  <div className="absolute top-4 left-4 bg-slate-900 text-white px-3 py-1.5 rounded-full text-[8px] font-black tracking-widest shadow-lg flex items-center gap-2 z-10">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div> RENDU LIVE
+                  </div>
+                  
+                  <div className="relative z-10 transform group-hover:scale-105 transition-transform duration-500 mt-4">
+                    <QRVisual 
+                      options={{ 
+                        url: genType === 'vcard' ? "BEGIN:VCARD..." : (url || "https://qrlyze.io"), 
+                        color: qrColor, 
+                        bgColor: bgColor, 
+                        dotType, 
+                        eyeType, 
+                        logo, 
+                        logoSize 
+                      }} 
+                      size={180} 
+                    />
+                  </div>
                </div>
             </div>
           )}
         </form>
       </div>
 
-      <div className="flex items-center gap-4 mb-12">
-          <div className="h-px bg-slate-200 flex-1"></div>
-          <h2 className="text-xs font-black uppercase text-slate-300 tracking-[0.4em]">Mes créations : {getDisplayTitle()}</h2>
-          <div className="h-px bg-slate-200 flex-1"></div>
+      {/* SEPARATEUR HISTORIQUE */}
+      <div className="flex items-center gap-6 mb-12 relative z-10">
+          <div className="h-px bg-gradient-to-r from-transparent to-slate-200 flex-1"></div>
+          <h2 className="text-[11px] font-black uppercase text-slate-400 tracking-[0.4em] flex items-center gap-3">
+            Mes créations <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span> {getDisplayTitle()}
+          </h2>
+          <div className="h-px bg-gradient-to-l from-transparent to-slate-200 flex-1"></div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
+      {/* GRILLE HISTORIQUE */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20 relative z-10">
         {filteredHistory.map(item => (
           <ItemCard key={item.id} item={item} openDeleteModal={openDeleteModal} fetchHistory={fetchHistory} />
         ))}
         {filteredHistory.length === 0 && (
-          <div className="col-span-full py-20 text-center bg-slate-100/50 rounded-[2.5rem] border-2 border-dashed border-slate-200">
-            <p className="text-slate-300 font-black uppercase tracking-widest text-sm md:text-lg italic">Aucun contenu trouvé dans cette catégorie</p>
+          <div className="col-span-full py-24 text-center bg-white/50 backdrop-blur-sm rounded-[3rem] border border-slate-100 shadow-sm">
+            <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
+              <Layers size={24} />
+            </div>
+            <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Aucun contenu trouvé dans cette catégorie</p>
           </div>
         )}
       </div>
