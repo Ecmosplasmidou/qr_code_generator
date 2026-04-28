@@ -120,7 +120,7 @@ const StatsPage = ({ history }) => {
                         </p>
                         <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
                         <p className="text-[10px] text-slate-400 flex items-center gap-1.5 uppercase font-bold">
-                          <Globe size={12} className="text-blue-500 opacity-60"/> {scan.country || "IP Directe"}
+                          <Globe size={12} className="text-blue-500 opacity-60"/> {scan.country || "IP"}
                         </p>
                       </div>
                     </div>
