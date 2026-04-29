@@ -4,7 +4,7 @@ import {
   Rocket, QrCode, UserPlus, CheckCircle2, ShieldCheck, 
   Zap, Download, Smartphone, Store, 
   ArrowRight, Sparkles, Globe, BarChart3, Fingerprint, RefreshCw,
-  Plus, Minus, Info, FileText, Bitcoin
+  Plus, Minus, Info, FileText, Bitcoin, Palette, Activity
 } from 'lucide-react';
 import QRVisual from '../components/QRVisual';
 
@@ -131,7 +131,7 @@ const LandingPage = () => {
                     <button onClick={downloadSandboxQR} className="w-full bg-blue-600 text-white py-3.5 md:py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-blue-600 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.4)]">
                       <Download size={16}/> Télécharger (PNG)
                     </button>
-                    <Link to="/auth" className="block text-center text-slate-400 font-bold text-[9px] uppercase tracking-tighter hover:text-white transition-colors px-2">
+                    <Link to="/auth?mode=register" className="block text-center text-slate-400 font-bold text-[9px] uppercase tracking-tighter hover:text-white transition-colors px-2">
                       Passer en PRO pour format Vecteur (SVG)
                     </Link>
                   </div>
@@ -141,9 +141,69 @@ const LandingPage = () => {
           </div>
         </section>
 
+        {/* --- NOUVELLE SECTION : POURQUOI PASSER PRO ? --- */}
+        <section className="relative bg-slate-900 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-14 lg:p-20 overflow-hidden shadow-2xl group mx-2 md:mx-0">
+          {/* Lueur arrière-plan */}
+          <div className="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2000&auto=format&fit=crop')] opacity-[0.05] mix-blend-overlay group-hover:scale-105 transition-transform duration-1000"></div>
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-600/30 rounded-full blur-[100px] pointer-events-none"></div>
+
+          <div className="relative z-10 flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+            
+            {/* Texte et Valeur */}
+            <div className="flex-1 text-center lg:text-left space-y-6 md:space-y-8">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter italic text-white leading-[0.9]">
+                Pensez plus grand avec <span className="text-blue-500 drop-shadow-[0_0_20px_rgba(59,130,246,0.5)]">QRLYZE Pro.</span>
+              </h2>
+              <p className="text-slate-400 font-medium text-base md:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0">
+                Vous venez de créer un QR code statique. C'est bien. Mais imaginez pouvoir <strong>modifier le lien</strong> une fois imprimé, <strong>suivre qui le scanne</strong>, ou ajouter <strong>votre logo au centre</strong>. Tout cela est possible pour le prix d'un café.
+              </p>
+              
+              <Link to="/auth?mode=register" className="inline-flex items-center justify-center gap-3 bg-blue-600 text-white px-8 py-4 md:py-5 rounded-2xl md:rounded-[1.25rem] font-black uppercase text-[10px] md:text-xs tracking-widest hover:bg-white hover:text-slate-900 transition-all shadow-[0_0_30px_rgba(37,99,235,0.4)] hover:shadow-[0_0_40px_rgba(255,255,255,0.6)] w-full sm:w-auto">
+                Devenir Pro pour 2€/mois <ArrowRight size={18}/>
+              </Link>
+            </div>
+
+            {/* Grille des fonctionnalités Pro */}
+            <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[2rem] hover:bg-white/10 transition-colors duration-300">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mb-4">
+                  <Activity size={24} strokeWidth={2.5}/>
+                </div>
+                <h3 className="text-white font-black uppercase tracking-widest text-sm mb-2">Analytics Précis</h3>
+                <p className="text-slate-400 text-xs font-medium leading-relaxed">Sachez où, quand et avec quel appareil vos codes sont scannés.</p>
+              </div>
+              
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[2rem] hover:bg-white/10 transition-colors duration-300">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mb-4">
+                  <RefreshCw size={24} strokeWidth={2.5}/>
+                </div>
+                <h3 className="text-white font-black uppercase tracking-widest text-sm mb-2">Liens Dynamiques</h3>
+                <p className="text-slate-400 text-xs font-medium leading-relaxed">Corrigez une faute ou changez de campagne sans réimprimer vos supports.</p>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[2rem] hover:bg-white/10 transition-colors duration-300">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mb-4">
+                  <Palette size={24} strokeWidth={2.5}/>
+                </div>
+                <h3 className="text-white font-black uppercase tracking-widest text-sm mb-2">Studio Design</h3>
+                <p className="text-slate-400 text-xs font-medium leading-relaxed">Customisez les couleurs, les formes, et intégrez votre propre logo.</p>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[2rem] hover:bg-white/10 transition-colors duration-300">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mb-4">
+                  <ShieldCheck size={24} strokeWidth={2.5}/>
+                </div>
+                <h3 className="text-white font-black uppercase tracking-widest text-sm mb-2">0 Engagement</h3>
+                <p className="text-slate-400 text-xs font-medium leading-relaxed">Gérez votre abonnement via Stripe. Annulez en un clic à tout moment.</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
         {/* HOW TO SECTION */}
         <section className="space-y-12 md:space-y-20 relative">
-          <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-center px-4">Comment créer un QR code ?</h2>
+          <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-center px-4">Comment créer un code QR ?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 relative z-10">
             <Step number="1" title="Sélectionnez" desc="Choisissez le type de contenu (URL, vCard, PDF) adapté à votre besoin." />
             <Step number="2" title="Générez" desc="Remplissez les champs nécessaires. Le code se met à jour en temps réel." />
@@ -228,7 +288,7 @@ const LandingPage = () => {
             <p className="text-slate-300 font-medium max-w-md mx-auto mb-8 md:mb-10 text-sm md:text-lg px-4">
               Rejoignez les entreprises qui utilisent QRLYZE pour tracker leurs campagnes marketing.
             </p>
-            <Link to="/auth" className="inline-flex items-center justify-center gap-3 md:gap-4 bg-white text-slate-900 px-8 py-5 md:px-12 md:py-6 rounded-2xl md:rounded-[1.25rem] font-black uppercase text-xs md:text-sm tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-[0_0_40px_rgba(255,255,255,0.2)] w-full sm:w-auto">
+            <Link to="/auth?mode=register" className="inline-flex items-center justify-center gap-3 md:gap-4 bg-white text-slate-900 px-8 py-5 md:px-12 md:py-6 rounded-2xl md:rounded-[1.25rem] font-black uppercase text-xs md:text-sm tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-[0_0_40px_rgba(255,255,255,0.2)] w-full sm:w-auto">
               Démarrer maintenant <ArrowRight size={20}/>
             </Link>
           </div>
@@ -239,6 +299,7 @@ const LandingPage = () => {
   );
 };
 
+// COMPOSANTS INTERNES
 const TabItem = ({ active, onClick, icon, label }) => (
   <button onClick={onClick} className={`shrink-0 snap-center flex items-center gap-2 px-5 py-3 md:px-6 md:py-3.5 rounded-xl text-[10px] md:text-[11px] font-black transition-all ${active ? 'bg-slate-900 text-white shadow-xl scale-105' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}>
     {icon} {label}

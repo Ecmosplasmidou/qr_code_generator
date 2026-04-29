@@ -105,7 +105,7 @@ const AuthPage = ({ onLoginSuccess }) => {
               <input 
                 type="email" 
                 required 
-                placeholder="nom@entreprise.com" 
+                placeholder="nom@email.com" 
                 className="w-full pl-14 pr-6 py-5 rounded-2xl bg-slate-50 border border-slate-100 outline-none font-bold text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-inner" 
                 value={email} 
                 onChange={e => setEmail(e.target.value.toLowerCase())} 
