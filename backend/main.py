@@ -1,4 +1,4 @@
-import uuid, os, hashlib, jwt, bcrypt, stripe
+import uuid, os, hashlib, jwt, bcrypt, stripe, requests
 from datetime import datetime
 from functools import wraps
 from flask import Flask, request, redirect, jsonify
@@ -162,9 +162,37 @@ def redirect_and_track(short_id):
     if qr:
         ua = request.headers.get('User-Agent', '')
         device = "iPhone" if "iPhone" in ua else "Android" if "Android" in ua else "PC"
+        
+        client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        if client_ip:
+            client_ip = client_ip.split(',')[0].strip()
+        city = "Inconnue"
+        country = "Inconnu"
+        
+        try:
+            if client_ip and client_ip != "127.0.0.1":
+                geo_response = requests.get(f"http://ip-api.com/json/{client_ip}?fields=city,country", timeout=1.5)
+                if geo_response.status_code == 200:
+                    geo_data = geo_response.json()
+                    city = geo_data.get('city', "Inconnue")
+                    country = geo_data.get('country', "Inconnu")
+        except Exception as e:
+            print(f"Erreur géolocalisation: {e}")
+
         qrcodes_collection.update_one(
             {"id": short_id}, 
-            {"$inc": {"scanCount": 1}, "$push": {"scans_history": {"date": datetime.now().strftime("%d/%m/%Y %H:%M"), "device": device}}}
+            {
+                "$inc": {"scanCount": 1}, 
+                "$push": {
+                    "scans_history": {
+                        "date": datetime.now().strftime("%d/%m/%Y %H:%M"), 
+                        "device": device,
+                        "ip": client_ip,
+                        "city": city,
+                        "country": country
+                    }
+                }
+            }
         )
         return redirect(qr['originalUrl'])
     return "Not Found", 404

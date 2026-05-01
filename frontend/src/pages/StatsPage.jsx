@@ -107,20 +107,21 @@ const StatsPage = ({ history }) => {
           <div className="grid gap-3">
             {item.scans_history && item.scans_history.length > 0 ? (
               [...item.scans_history].reverse().map((scan, i) => (
+              console.log("Données du scan :", scan),
                 <div key={i} className="flex flex-col sm:flex-row items-center justify-between p-6 rounded-[2rem] bg-white border border-slate-100 hover:border-blue-200 hover:shadow-[0_10px_30px_-15px_rgba(37,99,235,0.1)] transition-all duration-300 group">
                   <div className="flex items-center gap-6">
                     <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
                       <Smartphone size={22} strokeWidth={2.5}/>
                     </div>
                     <div>
-                      <p className="font-black text-xs uppercase text-slate-800 tracking-wide">{scan.device || "Appareil Mobile"}</p>
+                      <p className="font-black text-xs uppercase text-slate-800 tracking-wide">{scan.device || "Appareil Inconnu"}</p>
                       <div className="flex items-center gap-3 mt-1">
                         <p className="text-[10px] text-slate-400 flex items-center gap-1.5 uppercase font-bold">
-                          <MapPin size={12} className="text-red-500 opacity-60"/> {scan.city || "INCONNUE"}
+                          <MapPin size={12} className="text-red-500 opacity-60"/> {scan.city || "Ville inconnue"}
                         </p>
                         <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
                         <p className="text-[10px] text-slate-400 flex items-center gap-1.5 uppercase font-bold">
-                          <Globe size={12} className="text-blue-500 opacity-60"/> {scan.country || "IP"}
+                          <Globe size={12} className="text-blue-500 opacity-60"/> {scan.ip || scan.country || "IP"}
                         </p>
                       </div>
                     </div>

@@ -6,3 +6,4 @@ pyjwt
 bcrypt
 stripe
 gunicorn
+requests
